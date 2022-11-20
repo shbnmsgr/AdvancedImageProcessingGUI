@@ -1,0 +1,43 @@
+clear,clc,close all
+
+image = imread('mainpic.tif');
+Features_1 = image()
+K1 = 6;
+M =zeros(size(Features_1,3),K1);
+while true
+    % Random Centers
+    for z =1:size(Features_1,3)
+        M(z,:) = randi([0,255],1,K1);
+    end
+    M = mat2gray(M);
+    
+    SSE1 = [];
+    dSSE1 = [];
+    for i = 1:100
+        
+        Dist1 = EuclideanDistCompute(Features_1,M);
+        
+        C1 = Classifier_Kmeans(Features_1,Dist1);
+        
+        M = MeanComputer(Features_1,C1);
+        
+        SSE1(i) = sum(sum(Dist1.^2));
+        if i>1
+            dSSE1(i-1) = abs(SSE1(i)- SSE1(i-1));
+            if dSSE1(i-1)<1e-20
+                break
+            end
+        end
+        
+    end
+    
+    if i<100
+        break
+    end
+end
+
+
+final1 = ToRGB(C1);
+imshow(final1),title('first 7 features (K-Means)')
+
+
